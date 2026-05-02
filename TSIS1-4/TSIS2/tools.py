@@ -1,26 +1,5 @@
-"""
-tools.py  –  Drawing tool implementations for the Paint application (TSIS 2)
-============================================================================
-Each tool is a class that implements a common interface:
-
-    on_mouse_down(canvas, pos, color, size)  – called on MOUSEBUTTONDOWN
-    on_mouse_move(canvas, pos, color, size)  – called on MOUSEMOTION (btn held)
-    on_mouse_up  (canvas, pos, color, size)  – called on MOUSEBUTTONUP
-    draw_preview (overlay, pos, color, size) – draw a live-preview onto a
-                                               transparent overlay surface
-                                               (called every frame while active)
-
-`canvas`  is the persistent drawing surface (pygame.Surface).
-`overlay` is a per-frame transparent surface for in-progress previews.
-"""
-
 import pygame
 import collections
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Base class
-# ─────────────────────────────────────────────────────────────────────────────
 
 class BaseTool:
     """Provides no-op defaults so subclasses only override what they need."""
@@ -36,11 +15,6 @@ class BaseTool:
 
     def draw_preview(self, overlay, pos, color, size):
         pass
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.1  Pencil (freehand)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class PencilTool(BaseTool):
     """
@@ -68,10 +42,6 @@ class PencilTool(BaseTool):
         self._last_pos = None
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.1  Straight Line tool (with live preview)
-# ─────────────────────────────────────────────────────────────────────────────
-
 class LineTool(BaseTool):
     """
     Click → drag → release to draw a straight line.
@@ -96,9 +66,6 @@ class LineTool(BaseTool):
             pygame.draw.line(overlay, preview_color, self._start, pos, size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Rectangle tool (from Practice 10, size-aware)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class RectangleTool(BaseTool):
     def __init__(self):
@@ -119,9 +86,6 @@ class RectangleTool(BaseTool):
             pygame.draw.rect(overlay, color + (160,), rect, size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Filled Rectangle
-# ─────────────────────────────────────────────────────────────────────────────
 
 class FilledRectangleTool(BaseTool):
     def __init__(self):
@@ -142,9 +106,6 @@ class FilledRectangleTool(BaseTool):
             pygame.draw.rect(overlay, color + (100,), rect)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Circle tool (from Practice 10, size-aware)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class CircleTool(BaseTool):
     def __init__(self):
@@ -165,9 +126,6 @@ class CircleTool(BaseTool):
             pygame.draw.circle(overlay, color + (160,), self._start, radius, size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Square tool (Practice 11)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class SquareTool(BaseTool):
     def __init__(self):
@@ -196,9 +154,6 @@ class SquareTool(BaseTool):
             pygame.draw.rect(overlay, color + (160,), rect, size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Right Triangle tool (Practice 11)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class RightTriangleTool(BaseTool):
     def __init__(self):
@@ -222,10 +177,6 @@ class RightTriangleTool(BaseTool):
         if self._start:
             pygame.draw.polygon(overlay, color + (160,), self._points(self._start, pos), size)
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Equilateral Triangle tool (Practice 11)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class EquilateralTriangleTool(BaseTool):
     """Click = apex, drag to set the size (base midpoint distance)."""
@@ -261,10 +212,6 @@ class EquilateralTriangleTool(BaseTool):
             pygame.draw.polygon(overlay, color + (160,), pts, size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Rhombus tool (Practice 11)
-# ─────────────────────────────────────────────────────────────────────────────
-
 class RhombusTool(BaseTool):
     def __init__(self):
         self._start = None
@@ -292,9 +239,6 @@ class RhombusTool(BaseTool):
             pygame.draw.polygon(overlay, color + (160,), self._points(self._start, pos), size)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Eraser tool (from Practice 10)
-# ─────────────────────────────────────────────────────────────────────────────
 
 class EraserTool(BaseTool):
     """Paints white over the canvas, using size to control eraser width."""
@@ -324,9 +268,6 @@ class EraserTool(BaseTool):
         pygame.draw.circle(overlay, (180, 180, 180, 120), pos, erase_size, 2)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.3  Flood Fill tool
-# ─────────────────────────────────────────────────────────────────────────────
 
 class FillTool(BaseTool):
     """
@@ -380,9 +321,6 @@ def _flood_fill(surface: pygame.Surface, seed: tuple, fill_color: tuple):
                 queue.append((nx, ny))
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# 3.5  Text tool
-# ─────────────────────────────────────────────────────────────────────────────
 
 class TextTool(BaseTool):
     """
@@ -460,9 +398,6 @@ class TextTool(BaseTool):
                              (cx, cy), (cx, cy + self._font_size), 2)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Utility helpers
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _points_to_rect(p1: tuple, p2: tuple) -> pygame.Rect:
     """Return a normalised pygame.Rect from any two corner points."""
