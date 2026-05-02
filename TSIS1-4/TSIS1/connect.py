@@ -1,6 +1,3 @@
-# connect.py
-# Provides a single get_connection() factory used across all modules.
-
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from config import DB_CONFIG
