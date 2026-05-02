@@ -1,25 +1,8 @@
-"""
-racer.py  –  Core gameplay module (TSIS 3)
-==========================================
-Builds on Practice 10/11 (coins, weighted values, enemy speed scaling)
-and adds:
-  • Lane hazards (oil spills, slow zones)
-  • Dynamic road events (speed bumps, nitro strips, moving barriers)
-  • Traffic cars that end the run on collision
-  • Three power-ups: Nitro, Shield, Repair
-  • Difficulty scaling
-  • Score = coins × value + distance bonus + power-up bonuses
-  • Distance meter and finish line
-  • HUD for power-up timer, shield, distance
-Returns a stats dict when the run ends so main.py can save the score.
-"""
-
 import pygame
 import random
 import math
 import sys
 
-# ── Layout ────────────────────────────────────────────────────────────────────
 W, H        = 700, 750
 ROAD_LEFT   = 130
 ROAD_RIGHT  = 570
@@ -29,7 +12,6 @@ LANE_W      = ROAD_W // N_LANES
 LANE_CENTERS = [ROAD_LEFT + LANE_W * i + LANE_W // 2 for i in range(N_LANES)]
 FINISH_DIST = 5000          # metres to finish
 
-# ── Colours ───────────────────────────────────────────────────────────────────
 C_BG        = (18,  20,  30)
 C_ROAD      = (38,  40,  55)
 C_KERB_W    = (230, 230, 230)
@@ -53,7 +35,6 @@ DIFF_PARAMS = {
     "hard":   {"base_speed": 9,  "spawn_rate": 0.022, "obstacle_rate": 0.014},
 }
 
-# ── Power-up types ────────────────────────────────────────────────────────────
 PU_NITRO  = "nitro"
 PU_SHIELD = "shield"
 PU_REPAIR = "repair"
@@ -61,7 +42,6 @@ PU_COLORS = {PU_NITRO: (255, 180, 0), PU_SHIELD: (0, 180, 255), PU_REPAIR: (60, 
 PU_LABELS = {PU_NITRO: "⚡NITRO", PU_SHIELD: "🛡SHIELD", PU_REPAIR: "🔧REPAIR"}
 PU_LIFETIME = 6000    # ms before disappearing if uncollected
 
-# ── Weighted coin values (from Practice 11) ───────────────────────────────────
 COIN_WEIGHTS = [(1, 50), (2, 30), (5, 15), (10, 5)]    # (value, weight)
 
 
@@ -73,10 +53,6 @@ def _weighted_coin_value():
 def _lane(n):
     return LANE_CENTERS[n % N_LANES]
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Sprite helpers
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _draw_car(surface, x, y, color, w=36, h=52, shadow=False):
     """Draw a simple car shape."""
@@ -156,10 +132,6 @@ def _draw_coin(surface, x, y, value):
     surface.blit(lbl, lbl.get_rect(center=(x, y)))
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Main gameplay function
-# ─────────────────────────────────────────────────────────────────────────────
-
 def run_game(screen: pygame.Surface, settings: dict) -> dict:
     """
     Run one race. Returns stats dict:
@@ -179,7 +151,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
         "xl":  pygame.font.SysFont("dejavusans", 32, bold=True),
     }
 
-    # ── Player state ──────────────────────────────────────────────────────────
     player_lane  = 1          # 0–3
     player_x     = _lane(player_lane)
     player_y     = H - 120
@@ -191,13 +162,11 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
     distance        = 0       # pixels → metres at 0.1 scale
     road_scroll     = 0
 
-    # ── Power-up state ────────────────────────────────────────────────────────
     active_pu       = None    # PU_NITRO | PU_SHIELD | PU_REPAIR | None
     pu_timer        = 0       # ms remaining for timed power-ups
     shielded        = False
     crashed_once    = False   # Repair tracks "one crash forgiven"
 
-    # ── Entity lists ──────────────────────────────────────────────────────────
     # Each entry: {"x","y","kind",...}
     traffic      = []
     obstacles    = []     # kind: oil | barrier | pothole | bump | nitro_strip
@@ -220,11 +189,9 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
 
     hazard_lanes = _reset_hazard_lanes()
 
-    # ── Lane change animation ─────────────────────────────────────────────────
     target_x   = player_x
     LANE_SPEED = 12
 
-    # ── Difficulty scaling ────────────────────────────────────────────────────
     def current_spawn_rate():
         level = coins_collected // 10
         factor = 1 + level * 0.15
@@ -239,7 +206,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
         level = coins_collected // 10
         return base_speed + level * 0.5 + (3 if active_pu == PU_NITRO else 0)
 
-    # ── Road drawing ──────────────────────────────────────────────────────────
     def draw_road():
         # Grass shoulders
         pygame.draw.rect(screen, (30, 80, 30), pygame.Rect(0, 0, ROAD_LEFT, H))
@@ -271,7 +237,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
             s.fill((255, 60, 60, 18))
             screen.blit(s, (ROAD_LEFT + hl * LANE_W, 0))
 
-    # ── HUD ───────────────────────────────────────────────────────────────────
     def draw_hud():
         # Left panel
         pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(0, 0, ROAD_LEFT, H))
@@ -317,21 +282,17 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
         dif = fonts["sm"].render(diff.upper(), True, (200, 150, 60))
         screen.blit(dif, (ROAD_RIGHT + 4, 40))
 
-    # ── Collision helpers ─────────────────────────────────────────────────────
     def player_rect():
         return pygame.Rect(player_x - 18, player_y - 26, 36, 52)
 
     def collides(px, py, ex, ey, pr=22, er=20):
         return abs(px - ex) < (pr + er) and abs(py - ey) < (pr + er)
 
-    # ─────────────────────────────────────────────────────────────────────────
-    # Game loop
-    # ─────────────────────────────────────────────────────────────────────────
+
     running = True
     while running:
         dt = clock.tick(FPS)
 
-        # ── Events ───────────────────────────────────────────────────────────
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit(); sys.exit()
@@ -346,13 +307,11 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
                     return {"name": name, "score": score,
                             "distance": distance, "coins": coins_collected}
 
-        # ── Smooth lane transition ────────────────────────────────────────────
         if player_x < target_x:
             player_x = min(player_x + LANE_SPEED, target_x)
         elif player_x > target_x:
             player_x = max(player_x - LANE_SPEED, target_x)
 
-        # ── Scrolling ────────────────────────────────────────────────────────
         spd = player_speed
         road_scroll += spd
         distance = int(road_scroll * 0.05)
@@ -360,7 +319,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
         for d in road_dashes:
             d["y"] = (d["y"] + spd) % H
 
-        # ── Power-up timer tick ───────────────────────────────────────────────
         if active_pu == PU_NITRO:
             pu_timer -= dt
             player_speed = base_speed * 1.8
@@ -370,13 +328,11 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
         else:
             player_speed = base_speed
 
-        # ── Hazard lane refresh ───────────────────────────────────────────────
         hazard_timer += dt
         if hazard_timer >= HAZARD_INTERVAL:
             hazard_lanes  = _reset_hazard_lanes()
             hazard_timer  = 0
 
-        # ── Spawning ──────────────────────────────────────────────────────────
         sr = current_spawn_rate()
         or_ = current_obstacle_rate()
 
@@ -420,7 +376,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
             bx = random.choice(LANE_CENTERS)
             mov_barrier = {"x": bx, "y": -30, "dx": random.choice([-2, 2])}
 
-        # ── Update entities ───────────────────────────────────────────────────
         ts = traffic_speed()
 
         # Traffic
@@ -454,7 +409,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
             if mov_barrier["y"] > H + 40:
                 mov_barrier = None
 
-        # ── Collision detection ───────────────────────────────────────────────
         # Coins
         collected = []
         for c in coins:
@@ -535,10 +489,8 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
                 else:
                     game_over = True
 
-        # ── Distance score bonus ──────────────────────────────────────────────
         score = coins_collected * 10 + distance // 5
 
-        # ── Finish line ───────────────────────────────────────────────────────
         if distance >= FINISH_DIST:
             score += 2000     # finish bonus
             return {"name": name, "score": score,
@@ -548,7 +500,6 @@ def run_game(screen: pygame.Surface, settings: dict) -> dict:
             return {"name": name, "score": score,
                     "distance": distance, "coins": coins_collected}
 
-        # ── Draw ─────────────────────────────────────────────────────────────
         screen.fill(C_BG)
         draw_road()
 
