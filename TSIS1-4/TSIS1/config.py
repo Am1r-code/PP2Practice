@@ -1,8 +1,3 @@
-# config.py
-# Database connection configuration.
-# Edit the values below to match your PostgreSQL setup,
-# or set the corresponding environment variables.
-
 import os
 
 DB_CONFIG = {
@@ -13,5 +8,4 @@ DB_CONFIG = {
     "password": os.getenv("PB_PASSWORD", ""),
 }
 
-# Pagination default
 PAGE_SIZE = 10
