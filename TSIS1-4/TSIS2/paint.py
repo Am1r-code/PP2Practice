@@ -1,20 +1,3 @@
-"""
-paint.py  –  Extended Paint Application  (TSIS 2)
-=================================================
-New tools over Practice 10/11:
-  • Pencil   – freehand drawing
-  • Line     – straight line with live preview
-  • Fill     – flood-fill (BFS, exact colour match)
-  • Text     – click to place, type, Enter to commit, Escape to cancel
-  • Brush sizes: 1=small(2px)  2=medium(5px)  3=large(10px)
-  • Ctrl+S   – save canvas as timestamped PNG
-
-All Practice 10/11 shapes (rectangle, circle, square, right triangle,
-equilateral triangle, rhombus, eraser) are retained and respect brush size.
-
-Run:  python paint.py
-"""
-
 import sys
 import datetime
 
@@ -26,10 +9,6 @@ from tools import (
     SquareTool, RightTriangleTool, EquilateralTriangleTool, RhombusTool,
     EraserTool, FillTool, TextTool,
 )
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Layout constants
-# ─────────────────────────────────────────────────────────────────────────────
 
 WINDOW_W   = 1100
 WINDOW_H   = 720
@@ -61,11 +40,6 @@ PALETTE = [
 
 BRUSH_SIZES = {1: 2, 2: 5, 3: 10}    # key = shortcut digit, value = px
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Toolbar button descriptor
-# ─────────────────────────────────────────────────────────────────────────────
-
 class ToolButton:
     def __init__(self, label: str, tool_name: str, shortcut: str = ""):
         self.label      = label
@@ -86,10 +60,6 @@ class ToolButton:
             sc = font.render(self.shortcut, True, TEXT_MUTED)
             surface.blit(sc, sc.get_rect(midright=(self.rect.right - 6, self.rect.centery)))
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Main application class
-# ─────────────────────────────────────────────────────────────────────────────
 
 class PaintApp:
 
@@ -160,7 +130,6 @@ class PaintApp:
         # Status message (bottom of toolbar)
         self._status = "Ready"
 
-    # ── Layout ───────────────────────────────────────────────────────────────
 
     def _layout_toolbar(self):
         btn_h  = 30
@@ -172,7 +141,6 @@ class PaintApp:
             btn.rect = pygame.Rect(x, y, btn_w, btn_h)
             y += btn_h + 4
 
-    # ── Properties ───────────────────────────────────────────────────────────
 
     @property
     def active_tool(self):
@@ -182,7 +150,6 @@ class PaintApp:
     def brush_size(self) -> int:
         return BRUSH_SIZES[self.brush_size_key]
 
-    # ── Canvas helpers ────────────────────────────────────────────────────────
 
     def canvas_pos(self, screen_pos: tuple) -> tuple:
         """Convert screen coordinates to canvas-local coordinates."""
@@ -193,7 +160,6 @@ class PaintApp:
         x, y = screen_pos
         return TOOLBAR_W <= x < WINDOW_W and 0 <= y < WINDOW_H
 
-    # ── Save ─────────────────────────────────────────────────────────────────
 
     def save_canvas(self):
         """Save the canvas surface as a timestamped PNG file. (Ctrl+S)"""
@@ -203,19 +169,16 @@ class PaintApp:
         self._status = f"Saved: {filename}"
         print(f"[Save] {filename}")
 
-    # ── Event handling ────────────────────────────────────────────────────────
 
     def handle_events(self):
         mouse_pos = pygame.mouse.get_pos()
 
         for event in pygame.event.get():
 
-            # ── Quit ─────────────────────────────────────────────────────────
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
 
-            # ── Key down ──────────────────────────────────────────────────────
             elif event.type == pygame.KEYDOWN:
                 mods = pygame.key.get_mods()
 
@@ -258,7 +221,6 @@ class PaintApp:
                     pygame.quit()
                     sys.exit()
 
-            # ── Mouse down ────────────────────────────────────────────────────
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 pos = event.pos
 
@@ -271,14 +233,12 @@ class PaintApp:
                     self.active_tool.on_mouse_down(
                         self.canvas, cpos, self.color, self.brush_size)
 
-            # ── Mouse move ────────────────────────────────────────────────────
             elif event.type == pygame.MOUSEMOTION:
                 if self.drawing and self.on_canvas(event.pos):
                     cpos = self.canvas_pos(event.pos)
                     self.active_tool.on_mouse_move(
                         self.canvas, cpos, self.color, self.brush_size)
 
-            # ── Mouse up ──────────────────────────────────────────────────────
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 if self.drawing:
                     self.drawing = False
@@ -309,7 +269,6 @@ class PaintApp:
                 self._status = f"Brush size: {BRUSH_SIZES[key]}px"
                 return
 
-    # ── Drawing ───────────────────────────────────────────────────────────────
 
     def draw_toolbar(self):
         toolbar_rect = pygame.Rect(0, 0, TOOLBAR_W, WINDOW_H)
@@ -349,7 +308,6 @@ class PaintApp:
             txt = self.font_sm.render(lbl, True, TEXT_LIGHT)
             self.screen.blit(txt, txt.get_rect(center=rect.center))
 
-        # Section: Colour palette
         section_y += 38
         _draw_section_label(self.screen, self.font_sm, "COLORS",
                             8, section_y, TEXT_MUTED)
@@ -368,23 +326,19 @@ class PaintApp:
             if col == self.color:
                 pygame.draw.rect(self.screen, ACCENT, rect, 2, border_radius=3)
 
-        # Active colour swatch (large preview)
         preview_y = section_y + ((len(PALETTE) // cols) + 1) * (sw + gap) + 8
         pygame.draw.rect(self.screen, self.color,
                          pygame.Rect(8, preview_y, TOOLBAR_W - 16, 28), border_radius=5)
         pygame.draw.rect(self.screen, ACCENT,
                          pygame.Rect(8, preview_y, TOOLBAR_W - 16, 28), 1, border_radius=5)
 
-        # Status bar
         status_surf = self.font_sm.render(self._status, True, TEXT_MUTED)
         self.screen.blit(status_surf, (8, WINDOW_H - 22))
 
     def draw_frame(self):
         """Compose one full frame."""
-        # Draw canvas onto screen
         self.screen.blit(self.canvas, (TOOLBAR_W, 0))
 
-        # Draw live preview overlay
         self.overlay.fill((0, 0, 0, 0))
         mouse_pos = pygame.mouse.get_pos()
         if self.on_canvas(mouse_pos):
@@ -393,12 +347,10 @@ class PaintApp:
                 self.overlay, cpos, self.color, self.brush_size)
         self.screen.blit(self.overlay, (TOOLBAR_W, 0))
 
-        # Draw toolbar on top
         self.draw_toolbar()
 
         pygame.display.flip()
 
-    # ── Main loop ─────────────────────────────────────────────────────────────
 
     def run(self):
         while True:
@@ -407,18 +359,12 @@ class PaintApp:
             self.clock.tick(FPS)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Utility
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _draw_section_label(surface, font, text, x, y, color):
     surf = font.render(text, True, color)
     surface.blit(surf, (x, y))
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Entry point
-# ─────────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     app = PaintApp()
