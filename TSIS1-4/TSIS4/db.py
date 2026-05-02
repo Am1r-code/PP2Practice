@@ -1,11 +1,6 @@
-# db.py — PostgreSQL integration via psycopg2
-
 import psycopg2
 from config import DB_DSN
 
-# ──────────────────────────────────────────────
-# Schema
-# ──────────────────────────────────────────────
 SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS players (
     id       SERIAL PRIMARY KEY,
@@ -41,9 +36,6 @@ def init_db():
         return False
 
 
-# ──────────────────────────────────────────────
-# Players
-# ──────────────────────────────────────────────
 
 def get_or_create_player(username: str) -> int | None:
     """
@@ -71,9 +63,6 @@ def get_or_create_player(username: str) -> int | None:
         return None
 
 
-# ──────────────────────────────────────────────
-# Sessions
-# ──────────────────────────────────────────────
 
 def save_session(player_id: int, score: int, level_reached: int) -> bool:
     """Persist one game session. Returns True on success."""
