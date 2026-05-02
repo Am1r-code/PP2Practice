@@ -1,22 +1,3 @@
-"""
-phonebook.py  –  PhoneBook Extended Console Application  (TSIS 1)
-=================================================================
-New features over Practice 7 / 8:
-  • Extended schema  (phones table, groups, email, birthday)
-  • Filter by group
-  • Search by email (partial)
-  • Sort results by name / birthday / date added
-  • Paginated navigation (next / prev / quit)
-  • Export all contacts to JSON
-  • Import contacts from JSON (with skip / overwrite on duplicate)
-  • Extended CSV import (email, birthday, group, phone type)
-  • Stored procedure  add_phone
-  • Stored procedure  move_to_group
-  • DB function       search_contacts  (name + email + phones)
-
-Run:  python phonebook.py
-"""
-
 import csv
 import json
 import sys
