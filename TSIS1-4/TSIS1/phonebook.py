@@ -28,9 +28,7 @@ import psycopg2
 from config import DB_CONFIG, PAGE_SIZE
 from connect import get_connection, get_cursor
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Helpers
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _date_serial(obj):
     """JSON serialiser for date / datetime objects."""
@@ -62,9 +60,7 @@ def print_contact_row(row: dict):
     )
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # 3.1  Schema bootstrap  (apply schema.sql + procedures.sql on first run)
-# ─────────────────────────────────────────────────────────────────────────────
 
 def apply_sql_file(conn, path: str):
     """Execute every statement in a .sql file."""
@@ -89,9 +85,7 @@ def bootstrap_schema():
         sys.exit(1)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # 3.2  Advanced Console Search & Filter
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _fetch_groups(conn) -> list[dict]:
     with get_cursor(conn) as cur:
@@ -232,9 +226,7 @@ def _display_pages(rows: list):
             break
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # 3.3  Import / Export
-# ─────────────────────────────────────────────────────────────────────────────
 
 def export_to_json(conn):
     """Write all contacts (with phones and group) to a .json file."""
@@ -396,9 +388,7 @@ def import_from_csv(conn):
     print(f"CSV import complete: {inserted} inserted, {errors} errors.")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # 3.4  Stored Procedure wrappers
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _resolve_group(conn, group_name: str | None) -> int | None:
     """Return group id for the given name (case-insensitive), or None."""
@@ -441,9 +431,7 @@ def call_move_to_group(conn):
         print(f"[ERROR] {exc.pgerror or exc}")
 
 
-# ─────────────────────────────────────────────────────────────────────────────
 # Main menu
-# ─────────────────────────────────────────────────────────────────────────────
 
 MENU = """
 ╔══════════════════════════════════════════════╗
