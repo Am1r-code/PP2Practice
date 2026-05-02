@@ -1,7 +1,3 @@
-"""
-persistence.py  –  JSON persistence for leaderboard and settings (TSIS 3)
-"""
-
 import json
 import os
 from datetime import datetime
@@ -16,9 +12,6 @@ DEFAULT_SETTINGS = {
     "difficulty":  "normal",    # easy | normal | hard
     "player_name": "Player",
 }
-
-
-# ── Settings ──────────────────────────────────────────────────────────────────
 
 def load_settings() -> dict:
     if not os.path.exists(SETTINGS_FILE):
@@ -36,9 +29,6 @@ def load_settings() -> dict:
 def save_settings(settings: dict):
     with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=2)
-
-
-# ── Leaderboard ───────────────────────────────────────────────────────────────
 
 def load_leaderboard() -> list:
     if not os.path.exists(LEADERBOARD_FILE):
