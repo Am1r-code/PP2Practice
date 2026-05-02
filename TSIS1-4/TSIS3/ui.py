@@ -1,21 +1,6 @@
-"""
-ui.py  –  Screen renderers for all non-gameplay screens (TSIS 3)
-=================================================================
-Screens implemented here (all return the next GameState string):
-  • main_menu()
-  • leaderboard_screen()
-  • settings_screen()
-  • game_over_screen()
-  • name_entry_screen()
-
-Each function runs its own tight event loop and returns a string
-action such as "play", "menu", "quit", "leaderboard", "settings".
-"""
-
 import pygame
 import sys
 
-# ── Palette ───────────────────────────────────────────────────────────────────
 C_BG       = (12,  14,  22)
 C_ROAD     = (35,  38,  50)
 C_ACCENT   = (255, 200,  40)   # yellow
@@ -36,9 +21,6 @@ CAR_COLORS = {
 }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Reusable drawing primitives
-# ─────────────────────────────────────────────────────────────────────────────
 
 def _font(size: int, bold: bool = False) -> pygame.font.Font:
     return pygame.font.SysFont("dejavusans", size, bold=bold)
@@ -83,9 +65,6 @@ def _draw_car_icon(surface, cx, cy, color, w=28, h=44):
         pygame.draw.rect(surface, (30, 30, 30), pygame.Rect(wx, wy, 8, 10), border_radius=2)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Main Menu
-# ─────────────────────────────────────────────────────────────────────────────
 
 def main_menu(screen: pygame.Surface, settings: dict) -> str:
     """Returns: 'play' | 'leaderboard' | 'settings' | 'quit'"""
@@ -154,10 +133,6 @@ def main_menu(screen: pygame.Surface, settings: dict) -> str:
         clock.tick(60)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Name Entry
-# ─────────────────────────────────────────────────────────────────────────────
-
 def name_entry_screen(screen: pygame.Surface, default_name: str) -> str:
     """Lets the player enter their name. Returns the entered name."""
     W, H   = screen.get_size()
@@ -202,9 +177,6 @@ def name_entry_screen(screen: pygame.Surface, default_name: str) -> str:
         clock.tick(60)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Leaderboard Screen
-# ─────────────────────────────────────────────────────────────────────────────
 
 def leaderboard_screen(screen: pygame.Surface, entries: list) -> str:
     """Returns: 'menu'"""
@@ -271,9 +243,6 @@ def leaderboard_screen(screen: pygame.Surface, entries: list) -> str:
         clock.tick(60)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Settings Screen
-# ─────────────────────────────────────────────────────────────────────────────
 
 def settings_screen(screen: pygame.Surface, settings: dict) -> tuple:
     """
@@ -350,9 +319,6 @@ def settings_screen(screen: pygame.Surface, settings: dict) -> tuple:
         clock.tick(60)
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Game Over Screen
-# ─────────────────────────────────────────────────────────────────────────────
 
 def game_over_screen(screen: pygame.Surface, stats: dict) -> str:
     """
