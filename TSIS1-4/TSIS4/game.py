@@ -1,5 +1,3 @@
-# game.py — Core Snake game logic (state, entities, collision)
-
 import random
 import pygame
 from config import (
@@ -11,20 +9,12 @@ from config import (
     POWERUP_COLORS,
 )
 
-
-# ══════════════════════════════════════════════
-# Direction constants
-# ══════════════════════════════════════════════
 UP    = ( 0, -1)
 DOWN  = ( 0,  1)
 LEFT  = (-1,  0)
 RIGHT = ( 1,  0)
 OPPOSITE = {UP: DOWN, DOWN: UP, LEFT: RIGHT, RIGHT: LEFT}
 
-
-# ══════════════════════════════════════════════
-# Food
-# ══════════════════════════════════════════════
 class Food:
     """A single food item placed on the grid."""
 
@@ -76,9 +66,6 @@ class Food:
                                      border_radius=4)
 
 
-# ══════════════════════════════════════════════
-# Power-up
-# ══════════════════════════════════════════════
 class PowerUp:
     KIND_SPEED  = "speed_boost"
     KIND_SLOW   = "slow_motion"
@@ -113,10 +100,6 @@ class PowerUp:
         border_col = tuple(min(255, int(c + 60 * alpha)) for c in self.color)
         pygame.draw.rect(surface, border_col, rect, 2, border_radius=5)
 
-
-# ══════════════════════════════════════════════
-# Snake
-# ══════════════════════════════════════════════
 class Snake:
     def __init__(self, color):
         mid_x, mid_y = COLS // 2, ROWS // 2
@@ -175,9 +158,6 @@ class Snake:
                            (hx * CELL_SIZE + 15, hy * CELL_SIZE + 6), 1)
 
 
-# ══════════════════════════════════════════════
-# Game State
-# ══════════════════════════════════════════════
 class GameState:
     def __init__(self, settings: dict):
         self.settings      = settings
@@ -199,7 +179,6 @@ class GameState:
 
         self._spawn_food()
 
-    # ── helpers ────────────────────────────────
     def _occupied(self) -> set:
         """All cells taken by snake, obstacles, food, powerup."""
         taken = set(self.snake.body) | self.obstacles
@@ -216,7 +195,6 @@ class GameState:
                           if (c, r) not in taken]
         return random.choice(free) if free else None
 
-    # ── food spawning ──────────────────────────
     def _spawn_food(self):
         """Keep 2–3 food items on the field."""
         while len(self.foods) < 2:
@@ -249,7 +227,6 @@ class GameState:
             ])
             self.powerup = PowerUp(pos, kind)
 
-    # ── obstacles ─────────────────────────────
     def _place_obstacles(self):
         if self.level < OBSTACLE_START_LVL:
             return
@@ -265,14 +242,12 @@ class GameState:
                 continue
             self.obstacles.add(pos)
 
-    # ── level up ──────────────────────────────
     def _level_up(self):
         self.level     += 1
         self.food_eaten = 0
         # keep existing obstacles and add more
         self._place_obstacles()
 
-    # ── active effect ─────────────────────────
     def _apply_powerup(self, kind: str):
         self.active_effect = kind
         self.effect_start  = pygame.time.get_ticks()
@@ -284,7 +259,6 @@ class GameState:
             if pygame.time.get_ticks() - self.effect_start > POWERUP_EFFECT_MS:
                 self.active_effect = None
 
-    # ── current speed ─────────────────────────
     def current_fps(self) -> int:
         base = INITIAL_SPEED + (self.level - 1) * SPEED_INCREMENT
         if self.active_effect == PowerUp.KIND_SPEED:
@@ -293,7 +267,6 @@ class GameState:
             return max(2, base - 4)
         return base
 
-    # ── main update ───────────────────────────
     def update(self):
         if self.over:
             return
@@ -366,7 +339,6 @@ class GameState:
 
         self._spawn_food()
 
-    # ── draw ──────────────────────────────────
     def draw(self, surface, font_small):
         # obstacles
         for (ox, oy) in self.obstacles:
