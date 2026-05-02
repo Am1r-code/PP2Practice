@@ -1,12 +1,3 @@
--- procedures.sql
--- New server-side objects for TSIS 1.
--- Do NOT re-implement anything already present from Practice 8.
-
--- ─────────────────────────────────────────────────────────────────────────────
--- Procedure: add_phone
--- Adds a new phone number (with type) to an existing contact identified by name.
--- Raises an exception if the contact does not exist.
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE PROCEDURE add_phone(
     p_contact_name VARCHAR,
     p_phone        VARCHAR,
@@ -39,12 +30,6 @@ BEGIN
 END;
 $$;
 
-
--- ─────────────────────────────────────────────────────────────────────────────
--- Procedure: move_to_group
--- Moves a contact to a different group.
--- Creates the group if it does not already exist.
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE PROCEDURE move_to_group(
     p_contact_name VARCHAR,
     p_group_name   VARCHAR
@@ -80,13 +65,6 @@ END;
 $$;
 
 
--- ─────────────────────────────────────────────────────────────────────────────
--- Function: search_contacts
--- Extends the Practice-8 pattern-search to also match:
---   • email (contacts.email)
---   • all phone numbers in the phones table
--- Returns a result set of matching contacts with their primary phone and group.
--- ─────────────────────────────────────────────────────────────────────────────
 CREATE OR REPLACE FUNCTION search_contacts(p_query TEXT)
 RETURNS TABLE (
     contact_id  INTEGER,
