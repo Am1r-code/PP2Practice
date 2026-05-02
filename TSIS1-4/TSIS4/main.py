@@ -1,5 +1,3 @@
-# main.py — Entry point: screens, main loop, settings I/O
-
 import sys
 import json
 import pygame
@@ -17,10 +15,6 @@ from config import (
 SETTINGS_FILE = "settings.json"
 DEFAULT_SETTINGS = {"snake_color": [60, 200, 80], "grid_overlay": True, "sound": False}
 
-
-# ══════════════════════════════════════════════
-# Utilities
-# ══════════════════════════════════════════════
 
 def load_settings() -> dict:
     try:
@@ -74,10 +68,6 @@ class Button:
                 event.button == 1 and
                 self.rect.collidepoint(event.pos))
 
-
-# ══════════════════════════════════════════════
-# Screen: Username entry
-# ══════════════════════════════════════════════
 
 def screen_username(surface, clock, font_big, font_med, font_small, settings) -> str | None:
     username    = ""
@@ -139,11 +129,6 @@ def screen_username(surface, clock, font_big, font_med, font_small, settings) ->
             if btn_quit.clicked(event):
                 return None
 
-
-# ══════════════════════════════════════════════
-# Screen: Main Menu
-# ══════════════════════════════════════════════
-
 def screen_main_menu(surface, clock, font_big, font_med, font_small, settings) -> str:
     cx = WINDOW_WIDTH // 2
     btn_play  = Button((cx - 100, 270, 200, 52), "PLAY",        font_med)
@@ -181,10 +166,6 @@ def screen_main_menu(surface, clock, font_big, font_med, font_small, settings) -
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return "quit"
 
-
-# ══════════════════════════════════════════════
-# Screen: Leaderboard
-# ══════════════════════════════════════════════
 
 def screen_leaderboard(surface, clock, font_big, font_med, font_small, settings, db_ok: bool):
     rows   = db.get_leaderboard(10) if db_ok else []
@@ -238,10 +219,6 @@ def screen_leaderboard(surface, clock, font_big, font_med, font_small, settings,
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 return
 
-
-# ══════════════════════════════════════════════
-# Screen: Settings
-# ══════════════════════════════════════════════
 
 PRESET_COLORS = [
     (60,  200,  80),   # default green
@@ -328,10 +305,6 @@ def screen_settings(surface, clock, font_big, font_med, font_small, settings):
                 return
 
 
-# ══════════════════════════════════════════════
-# HUD during gameplay
-# ══════════════════════════════════════════════
-
 def draw_hud(surface, state: GameState, personal_best: int,
              font_med, font_small, username: str):
     # semi-transparent side panel
@@ -388,10 +361,6 @@ def draw_hud(surface, state: GameState, personal_best: int,
         surface.blit(ls, (x, y)); y += 20
 
 
-# ══════════════════════════════════════════════
-# Screen: Game Over
-# ══════════════════════════════════════════════
-
 def screen_game_over(surface, clock, font_big, font_med, font_small,
                      settings, score, level, personal_best) -> str:
     cx       = WINDOW_WIDTH // 2
@@ -440,11 +409,6 @@ def screen_game_over(surface, clock, font_big, font_med, font_small,
                     return "retry"
                 if event.key == pygame.K_ESCAPE:
                     return "menu"
-
-
-# ══════════════════════════════════════════════
-# Gameplay loop
-# ══════════════════════════════════════════════
 
 def run_game(surface, clock, font_med, font_small,
              settings, player_id, username, personal_best, db_ok) -> tuple:
@@ -502,9 +466,6 @@ def run_game(surface, clock, font_med, font_small,
     return state.score, state.level, best
 
 
-# ══════════════════════════════════════════════
-# Main
-# ══════════════════════════════════════════════
 
 def main():
     pygame.init()
