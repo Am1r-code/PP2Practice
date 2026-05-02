@@ -1,12 +1,3 @@
-"""
-main.py  –  Racer Extended Entry Point (TSIS 3)
-================================================
-State machine:
-  menu → name_entry → game → game_over → menu
-                   ↘ leaderboard → menu
-                   ↘ settings → menu
-"""
-
 import pygame
 import sys
 
@@ -32,7 +23,6 @@ def main():
     state = "menu"
 
     while True:
-        # ── Main Menu ─────────────────────────────────────────────────────────
         if state == "menu":
             action = main_menu(screen, settings)
             if action == "quit":
@@ -44,14 +34,12 @@ def main():
             elif action == "settings":
                 state = "settings"
 
-        # ── Name Entry ────────────────────────────────────────────────────────
         elif state == "name_entry":
             name = name_entry_screen(screen, settings.get("player_name", "Player"))
             settings["player_name"] = name
             save_settings(settings)
             state = "game"
 
-        # ── Game ──────────────────────────────────────────────────────────────
         elif state == "game":
             stats = run_game(screen, settings)
             # Persist to leaderboard
@@ -62,7 +50,6 @@ def main():
             state = "game_over"
             last_stats = stats
 
-        # ── Game Over ─────────────────────────────────────────────────────────
         elif state == "game_over":
             action = game_over_screen(screen, last_stats)
             if action == "retry":
@@ -70,13 +57,11 @@ def main():
             else:
                 state = "menu"
 
-        # ── Leaderboard ───────────────────────────────────────────────────────
         elif state == "leaderboard":
             entries = load_leaderboard()
             leaderboard_screen(screen, entries)
             state = "menu"
 
-        # ── Settings ──────────────────────────────────────────────────────────
         elif state == "settings":
             _, updated = settings_screen(screen, settings)
             settings = updated
