@@ -1,0 +1,16 @@
+# connect.py
+# Provides a single get_connection() factory used across all modules.
+
+import psycopg2
+from psycopg2.extras import RealDictCursor
+from config import DB_CONFIG
+
+
+def get_connection():
+    """Return a new psycopg2 connection using settings from config.py."""
+    return psycopg2.connect(**DB_CONFIG)
+
+
+def get_cursor(conn):
+    """Return a RealDictCursor so rows are accessible as dicts."""
+    return conn.cursor(cursor_factory=RealDictCursor)
