@@ -1,8 +1,3 @@
--- schema.sql
--- Extended PhoneBook schema for TSIS 1
--- Builds on top of the base contacts table from Practice 7/8.
--- Run this once to migrate the existing database.
-
 -- ── 1. Groups table ───────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS groups (
     id   SERIAL PRIMARY KEY,
